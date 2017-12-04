@@ -2,7 +2,7 @@
 import os
 from PIL import Image
 
-# TODO 判定方法，一行像素与上一行的平均亮度值差大于一定阈值
+# 判定方法，一行像素与上一行的平均亮度值差大于一定阈值
 
 CONFIG = {
     'gate_brightness_diff': 50, # 行平均亮度差阈值
