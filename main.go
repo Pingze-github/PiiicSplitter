@@ -7,6 +7,8 @@ import (
 	"image/jpeg"
 	"image/color"
 	"image/draw"
+	"io"
+	"time"
 )
 
 func brightness(c color.Color) float32 {
@@ -18,7 +20,8 @@ func main() {
 	var gate_brightness_diff float32 = 5000 // 行平均亮度差阈值
 	var gate_split_min_height_rate float32 = 0.1 // 切块最小高度和宽度比
 	output_dir := "e:/testdata/splits" // 切块最小高度和宽度比
-	fmt.Println("程序启动")
+	start := time.Now().UnixNano()
+	fmt.Println("程序启动...")
 	path := "e:/testdata/testPiiic.jpg"
 	piiicFile, err := os.Open(path)
 	if err != nil {
@@ -45,19 +48,37 @@ func main() {
 	}
 	splitYList = append(splitYList, height)
 	index := 1
+
+	channel := make(chan int, 10)
+	quit := make(chan int)
+
+	jpegSave := func (splitFile io.Writer, split image.Image, num int) {
+		channel <- 1
+		jpeg.Encode(splitFile, split, nil)
+		<- channel
+		if num == index - 1 {
+			fmt.Printf("程序执行完毕，耗时 %d ms \n", (time.Now().UnixNano() - start) / 1e6)
+			<- quit
+		}
+	}
+
 	for i := 1; i < len(splitYList); i++ {
 		if splitYList[i] - splitYList[i-1] > gate_split_min_height {
 			splitPath := output_dir + fmt.Sprintf("/%d.jpg", index)
-			splitFile, err := os.Open(splitPath)
+			splitFile, err := os.OpenFile(splitPath, os.O_RDWR|os.O_CREATE, 0664)
 			if err != nil {
 				panic(err)
 			}
 			defer splitFile.Close()
-			split := image.NewRGBA(image.Rect(0, width, splitYList[i-1], splitYList[i]))
-			draw.Draw(split, piiic.Bounds().Add(image.Pt(10, 10)), piiic, piiic.Bounds().Min, draw.Src) //截取图片的一部分
-			jpeg.Encode(splitFile, split, nil)
+			rect := image.Rect(0, splitYList[i-1], width, splitYList[i])
+			split := image.NewRGBA(rect)
+			draw.Draw(split, rect, piiic, rect.Min, draw.Src) //截取图片的一部分
+			go jpegSave(splitFile, split, index)
 			fmt.Printf("保存 分块%d 到 %s\n", index, splitPath)
 			index ++
 		}
 	}
+	quit <- 1
 }
+
+
