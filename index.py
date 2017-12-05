@@ -15,7 +15,7 @@ def brightness(color):
     return color[0] * 0.30 + color[1] * 0.59 + color[2] * 0.11
 
 def main():
-    path = os.path.abspath('e:/testdata/testPiiic.jpg')
+    path = os.path.abspath('e:/testdata/testPiiic1.jpg')
     piiic = Image.open(path)
     width = piiic.width
     height = piiic.height
