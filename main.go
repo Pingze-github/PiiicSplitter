@@ -67,7 +67,6 @@ func main() {
 
 	finished := 0
 	jpegSave := func (splitFile io.Writer, split image.Image, num int, splitPath string) {
-		time.Sleep(1e9)
 		jpeg.Encode(splitFile, split, &jpeg.Options{Quality: 100})
 		fmt.Printf("保存 分块%d 到 %s\n", num, splitPath)
 		<- channel
