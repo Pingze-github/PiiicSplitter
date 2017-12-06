@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func ads(num float32) float32 {
+func absFloat32(num float32) float32 {
 	if num < 0 {
 		return -num
 	} else {
@@ -51,7 +51,7 @@ func main() {
 	for y := 1; y < height; y++ {
 		var diff float32 = 0
 		for x := 0; x < width; x += sample_step {
-			diff += ads(brightness(piiic.At(x, y)) - brightness(piiic.At(x, y - 1)))
+			diff += absFloat32(brightness(piiic.At(x, y)) - brightness(piiic.At(x, y - 1)))
 		}
 		diffAvg := diff / float32(sampleNum)
 		if diffAvg > gate_brightness_diff {
