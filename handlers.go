@@ -2,37 +2,23 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"os"
-	"io"
-	"log"
+	"fmt"
 	"net/http"
 )
 
 func uploadHandler(c *gin.Context) {
 
-	name := c.PostForm("uploads")
-	log.Println("name",name)
-	file, header, err := c.Request.FormFile("upload")
-	if err != nil {
-		warn(err)
-		c.String(http.StatusBadRequest, "Interal Server Error")
-		return
+	form, _ := c.MultipartForm()
+	files := form.File["uploads"]
+
+	for _, file := range files {
+		fmt.Println("接收到上传文件",file.Filename)
+
+		// Upload the file to specific dst.
+		// c.SaveUploadedFile(file, dst)
 	}
-	filename := header.Filename
-
-	log.Println(file, err, filename)
-
-	out, err := os.Create(filename)
-	if err != nil {
-		log.Println(err)
-	}
-	defer out.Close()
-	_, err = io.Copy(out, file)
-	if err != nil {
-		log.Println(err)
-	}
-	c.String(http.StatusCreated, "upload successful")
+	c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
 
 
-	CReturn(c, RetBody{Data: "123"})
+	// CReturn(c, RetBody{Data: "123"})
 }
