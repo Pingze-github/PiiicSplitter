@@ -9,6 +9,7 @@ import (
 	"image/draw"
 	"io"
 	"time"
+	"sync"
 )
 
 func absFloat32(num float32) float32 {
@@ -27,14 +28,12 @@ func brightness(c color.Color) float32 {
 	return R * 0.3 + G * 0.59 + B * 0.11
 }
 
-func split() {
+func imgSplit(path string, outDir string) []string {
 	var gate_brightness_diff float32 = 50 // 行平均亮度差阈值
 	var gate_split_min_height_rate float32 = 0.1 // 切块最小高度和宽度比
 	var sample_step int = 10
-	output_dir := "e:/testdata/splits" // 切块最小高度和宽度比
 	start := time.Now().UnixNano()
 	fmt.Println("程序启动...")
-	path := "e:/testdata/testPiiic.jpg"
 	piiicFile, err := os.Open(path)
 	if err != nil {
 		panic(err)
@@ -64,14 +63,17 @@ func split() {
 
 	channel := make(chan int, 10)
 	quit := make(chan int)
+	var mutex sync.Mutex
 
-	finished := 0
+	var splitPaths []string;
 	jpegSave := func (splitFile io.Writer, split image.Image, num int, splitPath string) {
 		jpeg.Encode(splitFile, split, &jpeg.Options{Quality: 100})
 		fmt.Printf("保存 分块%d 到 %s\n", num, splitPath)
 		<- channel
-		finished ++
-		if finished == index - 1 {
+		mutex.Lock()
+		splitPaths = append(splitPaths, splitPath)
+		defer mutex.Unlock()
+		if len(splitPaths) >= index - 1 {
 			fmt.Printf("程序执行完毕，耗时 %d ms \n", (time.Now().UnixNano() - start) / 1e6)
 			<- quit
 		}
@@ -79,7 +81,7 @@ func split() {
 
 	for i := 1; i < len(splitYList); i++ {
 		if splitYList[i] - splitYList[i-1] > gate_split_min_height {
-			splitPath := output_dir + fmt.Sprintf("/%d.jpg", index)
+			splitPath := outDir + fmt.Sprintf("/%d.jpg", index)
 			splitFile, err := os.OpenFile(splitPath, os.O_RDWR|os.O_CREATE, 0664)
 			if err != nil {
 				panic(err)
@@ -94,6 +96,7 @@ func split() {
 		}
 	}
 	quit <- 1
+	return splitPaths
 }
 
 

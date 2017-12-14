@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"github.com/fatih/color"
 )
 
 type RetBody struct {
@@ -68,8 +67,3 @@ func request(url string) (content string, bytes []byte, err error) {
 	return
 }
 
-func warn(things interface{}) {
-	color.Set(color.FgMagenta, color.Bold)
-	defer color.Unset()
-	fmt.Println(things)
-}
