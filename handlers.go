@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"fmt"
+	"strings"
 )
 
 func uploadHandler(c *gin.Context) {
@@ -15,6 +16,9 @@ func uploadHandler(c *gin.Context) {
 		outDir := OUTPUT_DIR
 		c.SaveUploadedFile(file, uploadPath)
 		splitPaths = imgSplit(uploadPath, outDir)
+	}
+	for i, splitPath := range splitPaths {
+		splitPaths[i] = strings.Replace(splitPath, OUTPUT_DIR, "/split", 1)
 	}
 	CReturn(c, RetBody{Data: splitPaths})
 }

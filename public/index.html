@@ -9,27 +9,6 @@
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <style type="text/css">
-    #preview {
-        padding-top: 20px;
-        padding-bottom: 5px;
-        padding-left: 5px;
-    }
-    .msg {
-        display: none;
-        padding-top: 20px;
-        padding-bottom: 5px;
-        padding-left: 5px;
-    }
-    #clear-btn {
-        position: absolute;
-        opacity: 0;
-        top: 5px;
-        right: 10px;
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-        color: #66AFE9;
-    }
     @media (max-width: 768px) {
         #container {
             padding-top: 15px;
@@ -41,18 +20,11 @@
         }
     }
     @media (min-width: 768px) {
-        #inputer {
-            padding: 30px 30px 30px 30px;
-            border-bottom: 1px solid lightgray;
-        }
         #inputer input {
             width: 500px;
         }
         #inputer button {
             width: 100px;
-        }
-        #preview {
-            padding: 30px 30px 30px 30px;
         }
     }
 </style>
@@ -63,7 +35,7 @@
                 <input id="input-id" type="file" class="file" name="uploads" data-preview-file-type="text">
             </div>
         </form>
-        <div id="splits">
+        <div id="splits" class="center-block">
         </div>
     </div>
 </body>
@@ -94,8 +66,8 @@
                 var res = data.response;
                 if (res.Code === 0) {
                     splits = res.Data;
-                    for (split of splits) {
-                        $('#splits').append('<img src="' + split + '" />')
+                    for (var i in splits) {
+                        $('#splits').append('<img class="img-responsive" style="margin-bottom:10px" alt="分片' + i + '" src="' + splits[i] + '" />')
                     }
                 } else {
                     alert(res.Msg);

@@ -29,7 +29,7 @@ func brightness(c color.Color) float32 {
 }
 
 func imgSplit(path string, outDir string) []string {
-	var gate_brightness_diff float32 = 50 // 行平均亮度差阈值
+	var gate_brightness_diff float32 = 40 // 行平均亮度差阈值
 	var gate_split_min_height_rate float32 = 0.1 // 切块最小高度和宽度比
 	var sample_step int = 10
 	start := time.Now().UnixNano()
